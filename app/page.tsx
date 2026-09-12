@@ -1,19 +1,7 @@
-import { redirect } from 'next/navigation';
-import { readSession } from '@/lib/session';
-import { hasSeenStory } from '@/lib/hasSeenStory';
-import { PasswordGate } from '@/features/access/PasswordGate';
+import { requireAccess } from '@/lib/requireAccess';
 import { Hub } from '@/features/hub/Hub';
 
 export default async function HomePage() {
-  const who = readSession();
-
-  if (!who) {
-    return <PasswordGate />;
-  }
-
-  if (!(await hasSeenStory(who))) {
-    redirect('/story');
-  }
-
-  return <Hub who={who} />;
+  const user = await requireAccess();
+  return <Hub user={user} />;
 }

@@ -6,7 +6,7 @@ const DAILY_LINES = [
   'مهما بعدنا شوية، القلب فاكر مكانه.',
   'إحنا مش بس ذكريات، إحنا حكاية لسه بتتكتب.',
   'أجمل حاجة إن بكرة كمان هيبقى فيه إحنا.',
-  'مفيش مكان أحن من جنبك/جنبك.',
+  'مفيش مكان أحن من جنبك.',
   'كل التفاصيل الصغيرة دي، بحفظها كلها.',
 ];
 
@@ -15,10 +15,9 @@ export function getDailyLine(): string {
   return DAILY_LINES[dayIndex % DAILY_LINES.length];
 }
 
-export function getDaysTogether(): number | null {
-  const startDate = process.env.RELATIONSHIP_START_DATE;
-  if (!startDate) return null;
-  const start = new Date(startDate);
+export function getDaysTogether(relationshipStartDate: string | null): number | null {
+  if (!relationshipStartDate) return null;
+  const start = new Date(relationshipStartDate);
   if (Number.isNaN(start.getTime())) return null;
   const diffMs = Date.now() - start.getTime();
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));

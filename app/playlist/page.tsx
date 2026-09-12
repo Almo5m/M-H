@@ -1,15 +1,7 @@
-import { redirect } from 'next/navigation';
-import { readSession } from '@/lib/session';
-import { SceneShell } from '@/features/hub/SceneShell';
-import { PlaylistScene } from '@/features/scenes/playlist/PlaylistScene';
+import { requireAccess } from '@/lib/requireAccess';
+import { PlaylistPage } from '@/features/places/playlist/PlaylistPage';
 
-export default function PlaylistPage() {
-  const who = readSession();
-  if (!who) redirect('/');
-
-  return (
-    <SceneShell>
-      <PlaylistScene />
-    </SceneShell>
-  );
+export default async function Page() {
+  await requireAccess();
+  return <PlaylistPage />;
 }

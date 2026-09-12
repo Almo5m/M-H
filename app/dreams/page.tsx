@@ -1,15 +1,7 @@
-import { redirect } from 'next/navigation';
-import { readSession } from '@/lib/session';
-import { SceneShell } from '@/features/hub/SceneShell';
-import { DreamsScene } from '@/features/scenes/dreams/DreamsScene';
+import { requireAccess } from '@/lib/requireAccess';
+import { DreamsPage } from '@/features/places/dreams/DreamsPage';
 
-export default function DreamsPage() {
-  const who = readSession();
-  if (!who) redirect('/');
-
-  return (
-    <SceneShell>
-      <DreamsScene />
-    </SceneShell>
-  );
+export default async function Page() {
+  await requireAccess();
+  return <DreamsPage />;
 }

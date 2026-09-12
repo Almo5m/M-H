@@ -1,28 +1,28 @@
 import { NextResponse } from 'next/server';
-import { readSession } from '@/lib/session';
-import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { otherPartner } from '@/lib/types';
+import { getCurrentUser, getOtherMember } from '@/lib/auth';
+import { getSupabaseUserClient } from '@/lib/supabase/serverClient';
 
 const ONLINE_WINDOW_MS = 45_000;
 
-// Heartbeat: marks the caller as "here", and reports whether the other
-// partner is currently on the site too (checked in the same trip).
 export async function POST() {
-  const who = readSession();
-  if (!who) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
 
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseUserClient();
   const now = new Date();
 
-  await supabase.from('presence').update({ last_seen_at: now.toISOString() }).eq('who', who);
+  await supabase.from('presence').upsert({
+    user_id: user.id,
+    space_id: user.spaceId,
+    last_seen_at: now.toISOString(),
+  });
 
-  const { data } = await supabase
-    .from('presence')
-    .select('*')
-    .eq('who', otherPartner(who))
-    .maybeSingle();
+  const other = await getOtherMember(user.spaceId, user.id);
+  if (!other) return NextResponse.json({ otherOnline: false, otherName: null, otherLastSeenAt: null });
+
+  const { data } = await supabase.from('presence').select('last_seen_at').eq('user_id', other.id).maybeSingle();
 
   const otherOnline = data ? now.getTime() - new Date(data.last_seen_at).getTime() < ONLINE_WINDOW_MS : false;
 
-  return NextResponse.json({ otherOnline });
+  return NextResponse.json({ otherOnline, otherName: other.displayName, otherLastSeenAt: data?.last_seen_at ?? null });
 }

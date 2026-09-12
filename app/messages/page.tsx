@@ -1,15 +1,7 @@
-import { redirect } from 'next/navigation';
-import { readSession } from '@/lib/session';
-import { SceneShell } from '@/features/hub/SceneShell';
-import { LockedMessagesScene } from '@/features/scenes/messages/LockedMessagesScene';
+import { requireAccess } from '@/lib/requireAccess';
+import { MessagesPage } from '@/features/places/messages/MessagesPage';
 
-export default function MessagesPage() {
-  const who = readSession();
-  if (!who) redirect('/');
-
-  return (
-    <SceneShell>
-      <LockedMessagesScene />
-    </SceneShell>
-  );
+export default async function Page() {
+  await requireAccess();
+  return <MessagesPage />;
 }

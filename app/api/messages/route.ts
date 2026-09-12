@@ -1,68 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readSession } from '@/lib/session';
-import { getSupabaseServerClient } from '@/lib/supabase/server';
-import { otherPartner } from '@/lib/types';
+import { getCurrentUser, getOtherMember } from '@/lib/auth';
+import { getSupabaseUserClient } from '@/lib/supabase/serverClient';
 
-// Returns messages addressed to me: unlocked ones (with a flag for
-// "just unlocked, never seen" so the UI can show a clear notification),
-// and a count of how many are still locked (no content revealed).
 export async function GET() {
-  const who = readSession();
-  if (!who) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
 
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseUserClient();
   const now = new Date().toISOString();
 
-  const { data: unlocked } = await supabase
-    .from('locked_messages')
+  const { data: received } = await supabase
+    .from('messages')
     .select('*')
-    .eq('recipient', who)
-    .lte('unlock_at', now)
-    .order('unlock_at', { ascending: false });
+    .eq('space_id', user.spaceId)
+    .eq('recipient_id', user.id)
+    .or(`delivery_mode.eq.now,and(delivery_mode.eq.scheduled,unlock_at.lte.${now})`)
+    .order('created_at', { ascending: false });
 
-  const { count: lockedCount } = await supabase
-    .from('locked_messages')
-    .select('*', { count: 'exact', head: true })
-    .eq('recipient', who)
-    .gt('unlock_at', now);
+  const { data: waiting } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('space_id', user.spaceId)
+    .eq('recipient_id', user.id)
+    .eq('delivery_mode', 'scheduled')
+    .gt('unlock_at', now)
+    .order('unlock_at', { ascending: true });
 
-  const justUnlocked = (unlocked ?? []).filter((message) => !message.seen_unlocked_at);
+  const { data: written } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('space_id', user.spaceId)
+    .eq('created_by', user.id)
+    .order('created_at', { ascending: false });
 
+  const justUnlocked = (received ?? []).filter((message) => !message.seen_unlocked_at);
   if (justUnlocked.length > 0) {
     await supabase
-      .from('locked_messages')
+      .from('messages')
       .update({ seen_unlocked_at: now })
-      .in(
-        'id',
-        justUnlocked.map((message) => message.id),
-      );
+      .in('id', justUnlocked.map((message) => message.id));
   }
 
   return NextResponse.json({
-    unlocked: unlocked ?? [],
+    received: received ?? [],
+    waiting: waiting ?? [],
+    written: written ?? [],
     justUnlockedIds: justUnlocked.map((message) => message.id),
-    lockedCount: lockedCount ?? 0,
   });
 }
 
 export async function POST(request: NextRequest) {
-  const who = readSession();
-  if (!who) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'مش مسموحلك.' }, { status: 401 });
 
   const body = await request.json().catch(() => null);
   const content: string | undefined = body?.content;
+  const deliveryMode: string | undefined = body?.deliveryMode;
   const unlockAt: string | undefined = body?.unlockAt;
 
-  if (!content?.trim() || !unlockAt) {
+  if (!content?.trim() || !deliveryMode) {
     return NextResponse.json({ error: 'ناقص بيانات.' }, { status: 400 });
   }
+  if (deliveryMode === 'scheduled' && !unlockAt) {
+    return NextResponse.json({ error: 'محتاجين الميعاد.' }, { status: 400 });
+  }
 
-  const supabase = getSupabaseServerClient();
-  const { error } = await supabase.from('locked_messages').insert({
-    written_by: who,
-    recipient: otherPartner(who),
+  const other = await getOtherMember(user.spaceId, user.id);
+  if (!other) return NextResponse.json({ error: 'مفيش شريك في المساحة لسه.' }, { status: 400 });
+
+  const supabase = getSupabaseUserClient();
+  const { error } = await supabase.from('messages').insert({
+    space_id: user.spaceId,
+    created_by: user.id,
+    recipient_id: other.id,
     content: content.trim(),
-    unlock_at: unlockAt,
+    delivery_mode: deliveryMode,
+    unlock_at: deliveryMode === 'scheduled' ? unlockAt : null,
   });
 
   if (error) return NextResponse.json({ error: 'فشل الحفظ.' }, { status: 500 });
