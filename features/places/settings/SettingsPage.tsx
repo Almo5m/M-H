@@ -51,7 +51,7 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
       <Link href="/" className="fixed left-4 top-4 rounded-full bg-[#FFFBF6]/90 px-4 py-2 text-sm text-[#40383A] shadow">
         ← الرئيسية
       </Link>
@@ -67,7 +67,7 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
             onChange={(event) => setDisplayName(event.target.value)}
             className="w-full rounded-lg border border-[#8E6873]/20 bg-white px-3 py-2 text-sm outline-none"
           />
-          <button type="submit" disabled={savingName} className="rounded-lg bg-[#8E6873] px-4 py-1.5 text-sm text-white disabled:opacity-40">
+          <button type="submit" disabled={savingName} className="btn-primary">
             حفظ
           </button>
         </form>
@@ -80,7 +80,7 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
             onChange={(event) => setRelationshipStartDate(event.target.value)}
             className="w-full rounded-lg border border-[#8E6873]/20 bg-white px-3 py-2 text-sm outline-none"
           />
-          <button type="submit" disabled={savingDate} className="rounded-lg bg-[#8E6873] px-4 py-1.5 text-sm text-white disabled:opacity-40">
+          <button type="submit" disabled={savingDate} className="btn-primary">
             حفظ
           </button>
         </form>

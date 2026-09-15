@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useState } from 'react';
 
 interface Surprise {
@@ -71,20 +73,21 @@ export function SurprisePage() {
   const openedSurprise = ready.find((surprise) => surprise.id === openedId);
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl text-center">
         <div className="mb-8 flex items-baseline justify-between text-right">
           <div>
             <p className="font-arDisplay text-3xl text-[#40383A]">مفاجأة</p>
             <p className="text-[#8E6873]">في حاجة مستنياك في وقتها.</p>
           </div>
-          <button onClick={() => setShowForm((value) => !value)} className="text-sm text-[#8E6873] underline decoration-dotted">
+          <button onClick={() => setShowForm((value) => !value)} className="btn-ghost">
             + أجهز مفاجأة
           </button>
         </div>
 
         {openedSurprise ? (
-          <div className="animate-[surprise-open_0.6s_ease-out] rounded-2xl border border-[#C7A96B]/30 bg-white p-8">
+          <div className="animate-[surprise-open_0.6s_ease-out] soft-panel p-8">
             {openedSurprise.content_type === 'text' ? (
               <p className="text-lg text-[#40383A]">{openedSurprise.text_content}</p>
             ) : (
@@ -107,18 +110,18 @@ export function SurprisePage() {
                   <button
                     key={surprise.id}
                     onClick={() => setOpenedId(surprise.id)}
-                    className="w-full rounded-2xl border border-[#C7A96B]/40 bg-white px-6 py-8 text-[#40383A] shadow-sm"
+                    className="w-full soft-panel px-6 py-8 text-[#40383A] shadow-[0_4px_24px_rgba(199,169,107,0.2)] transition-transform duration-300 hover:-translate-y-1"
                   >
                     في مفاجأة مستنياك 🎁
                   </button>
                 ))}
               </div>
             ) : waitingCount > 0 ? (
-              <div className="mb-8 rounded-2xl border border-[#8E6873]/15 bg-white px-6 py-10">
-                <svg viewBox="0 0 40 40" className="mx-auto mb-4 h-12 w-12 text-[#B99AA1]" fill="none" stroke="currentColor" strokeWidth="1.3">
-                  <rect x="9" y="16" width="22" height="16" rx="1.5" />
-                  <path d="M9 16 L31 16 M20 16 L20 32" />
-                  <path d="M15 16 C15 11, 18 9, 20 12 C22 9, 25 11, 25 16" />
+              <div className="mb-8 soft-panel px-6 py-10">
+                <svg viewBox="0 0 40 40" className="mx-auto mb-4 h-12 w-12">
+                  <rect x="9" y="18" width="22" height="14" rx="2.5" fill="#C7A96B" />
+                  <rect x="9" y="13" width="22" height="6" rx="2" fill="#8E6873" />
+                  <rect x="18" y="13" width="4" height="19" fill="#FFFBF6" opacity="0.5" />
                 </svg>
                 <p className="text-[#40383A]">في مفاجأة مستنياك</p>
                 {countdown && (
@@ -136,7 +139,7 @@ export function SurprisePage() {
                 <p className="mb-2 text-sm text-[#8B8182]">مفاجآتي</p>
                 <ul className="space-y-2">
                   {mine.map((surprise) => (
-                    <li key={surprise.id} className="rounded-xl bg-white/60 px-4 py-2 text-xs text-[#8B8182]">
+                    <li key={surprise.id} className="list-item-enter soft-card px-4 py-2 text-xs text-[#8B8182]">
                       {surprise.revealed_at ? 'اتفتحت' : 'مستنية'} · {new Date(surprise.reveal_at).toLocaleDateString('ar-EG')}
                     </li>
                   ))}
@@ -147,7 +150,7 @@ export function SurprisePage() {
         )}
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="mt-8 space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6 text-right">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-3 soft-panel p-6 text-right">
             <div className="flex gap-2 text-xs">
               <button type="button" onClick={() => setContentType('text')} className={`rounded-full px-3 py-1 ${contentType === 'text' ? 'bg-[#8E6873] text-white' : 'bg-[#F7F1E8] text-[#40383A]'}`}>
                 رسالة

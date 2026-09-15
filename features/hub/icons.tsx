@@ -1,130 +1,85 @@
-// Hand-drawn line-art icons for the home page — no icon library, every
-// shape below is a bespoke SVG path built for this place's meaning.
+// Hand-drawn FILLED icons (no strokes/outlines) — soft two-tone shapes,
+// built for this project, not pulled from any icon library.
 
 type IconProps = { className?: string };
 
-const common = {
-  fill: 'none',
-  strokeWidth: 1.4,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-};
+const PRIMARY = '#8E6873';
+const SECONDARY = '#B99AA1';
+const GOLD = '#C7A96B';
 
 export function UsIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <rect x="8" y="10" width="17" height="13" rx="2" transform="rotate(-6 16.5 16.5)" />
-      <rect x="15" y="16" width="17" height="13" rx="2" transform="rotate(5 23.5 22.5)" />
-    </svg>
-  );
-}
-
-export function JourneyIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M7 12 C16 12, 16 20, 24 20" />
-      <path d="M7 28 C16 28, 16 20, 24 20" />
-      <path d="M24 20 L32 20" />
-    </svg>
-  );
-}
-
-export function MessageIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M20 10 C20 15, 20 15, 20 18" />
-      <circle cx="20" cy="9" r="1.6" fill="currentColor" stroke="none" />
-      <rect x="8" y="18" width="24" height="15" rx="2" />
-      <path d="M8 19 L20 28 L32 19" />
-    </svg>
-  );
-}
-
-export function TodayIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M20 32 C20 22, 20 18, 20 8" />
-      <path d="M20 12 C24 10, 27 12, 27 15 C24 15, 21 14, 20 12" />
-      <path d="M20 19 C16 17, 13 19, 13 22 C16 22, 19 21, 20 19" />
-      <path d="M20 26 C24 24, 27 26, 27 29 C24 29, 21 28, 20 26" />
-    </svg>
-  );
-}
-
-export function PlayIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M10 24 C10 18, 16 18, 16 24 C16 28, 10 28, 10 24 Z" />
-      <path d="M22 16 L30 16 L30 24 L22 24 Z" transform="rotate(10 26 20)" />
-    </svg>
-  );
-}
-
-export function ListenIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <rect x="6" y="13" width="28" height="16" rx="2" />
-      <circle cx="15" cy="21" r="4" />
-      <circle cx="25" cy="21" r="4" />
-      <path d="M6 13 L12 9 L28 9 L34 13" />
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="7" y="9" width="18" height="14" rx="4" transform="rotate(-7 16 16)" fill={SECONDARY} opacity="0.85" />
+      <rect x="15" y="17" width="18" height="14" rx="4" transform="rotate(6 24 24)" fill={PRIMARY} />
     </svg>
   );
 }
 
 export function DreamsIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M20 6 L28 18 L20 30 L12 18 Z" />
-      <path d="M20 30 C21 33, 19 35, 21 37" />
-    </svg>
-  );
-}
-
-export function HonestyIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M6 12 h16 a2 2 0 0 1 2 2 v6 a2 2 0 0 1 -2 2 h-9 l-4 4 v-4 h-3 a2 2 0 0 1 -2 -2 v-6 a2 2 0 0 1 2 -2 Z" />
-      <path d="M18 20 h14 a2 2 0 0 1 2 2 v5 a2 2 0 0 1 -2 2 h-2 v4 l-4 -4 h-8 a2 2 0 0 1 -2 -2 v-5 a2 2 0 0 1 2 -2 Z" />
-    </svg>
-  );
-}
-
-export function PlacesIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M20 8 C13 8, 10 14, 15 20 C17 23, 20 30, 20 32 C20 30, 23 23, 25 20 C30 14, 27 8, 20 8 Z" />
-      <circle cx="20" cy="16" r="2.4" />
-    </svg>
-  );
-}
-
-export function SurpriseIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <rect x="9" y="16" width="22" height="16" rx="1.5" />
-      <path d="M9 16 L31 16" />
-      <path d="M20 16 L20 32" />
-      <path d="M15 16 C15 11, 18 9, 20 12 C22 9, 25 11, 25 16" />
-    </svg>
-  );
-}
-
-export function MomentIcon({ className }: IconProps) {
-  return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M12 8 h16 M12 32 h16" />
-      <path d="M12 8 C12 16, 20 18, 20 20 C20 22, 12 24, 12 32" />
-      <path d="M28 8 C28 16, 20 18, 20 20 C20 22, 28 24, 28 32" />
-      <rect x="17" y="18.5" width="6" height="3" rx="0.5" fill="currentColor" stroke="none" />
+    <svg viewBox="0 0 40 40" className={className}>
+      <path d="M20 6 L29 18 L20 30 L11 18 Z" fill={GOLD} />
+      <path d="M20 30 C22 32, 19 34, 21 37 C22.5 35, 20.5 33, 20 30 Z" fill={PRIMARY} opacity="0.7" />
     </svg>
   );
 }
 
 export function RememberIcon({ className }: IconProps) {
   return (
-    <svg viewBox="0 0 40 40" className={className} stroke="currentColor" {...common}>
-      <path d="M14 8 v26" />
-      <path d="M14 9 h13 l-4 5 l4 5 h-13" />
+    <svg viewBox="0 0 40 40" className={className}>
+      <path d="M13 7 h14 a1 1 0 0 1 1 1 v25 l-8 -6 l-8 6 v-25 a1 1 0 0 1 1 -1 Z" fill={PRIMARY} />
+      <circle cx="20" cy="16" r="3" fill={GOLD} />
+    </svg>
+  );
+}
+
+export function ListenIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="6" y="12" width="28" height="17" rx="5" fill={SECONDARY} opacity="0.85" />
+      <circle cx="15" cy="20.5" r="4.5" fill={PRIMARY} />
+      <circle cx="25" cy="20.5" r="4.5" fill={PRIMARY} />
+      <circle cx="15" cy="20.5" r="1.4" fill="#FFFBF6" />
+      <circle cx="25" cy="20.5" r="1.4" fill="#FFFBF6" />
+    </svg>
+  );
+}
+
+export function PlayIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <ellipse cx="14" cy="24" rx="7" ry="6" fill={SECONDARY} opacity="0.85" transform="rotate(-8 14 24)" />
+      <rect x="21" y="12" width="11" height="11" rx="4" fill={GOLD} transform="rotate(12 26.5 17.5)" />
+    </svg>
+  );
+}
+
+export function TodayIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="18.5" y="14" width="3" height="18" rx="1.5" fill={PRIMARY} />
+      <ellipse cx="26" cy="14" rx="6" ry="4" fill={GOLD} transform="rotate(35 26 14)" />
+      <ellipse cx="14" cy="20" rx="6" ry="4" fill={SECONDARY} transform="rotate(-30 14 20)" />
+    </svg>
+  );
+}
+
+export function HonestyIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <path d="M6 11 h17 a3 3 0 0 1 3 3 v6 a3 3 0 0 1 -3 3 h-9 l-5 5 v-5 h-3 a3 3 0 0 1 -3 -3 v-6 a3 3 0 0 1 3 -3 Z" fill={SECONDARY} opacity="0.85" />
+      <path d="M17 19 h16 a3 3 0 0 1 3 3 v5 a3 3 0 0 1 -3 3 h-2 v4 l-4.5 -4 h-9.5 a3 3 0 0 1 -3 -3 v-5 a3 3 0 0 1 3 -3 Z" fill={PRIMARY} />
+    </svg>
+  );
+}
+
+export function SurpriseIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="8" y="17" width="24" height="15" rx="3" fill={GOLD} />
+      <rect x="8" y="12" width="24" height="6" rx="2" fill={PRIMARY} />
+      <rect x="18" y="12" width="4" height="20" fill="#FFFBF6" opacity="0.55" />
     </svg>
   );
 }

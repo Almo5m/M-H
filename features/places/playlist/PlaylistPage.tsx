@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useRef, useState } from 'react';
 
 interface Song {
@@ -14,6 +16,8 @@ export function PlaylistPage() {
   const [title, setTitle] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   async function load() {
@@ -29,17 +33,24 @@ export function PlaylistPage() {
   async function handleUpload(event: React.FormEvent) {
     event.preventDefault();
     if (!file || !title.trim()) return;
+    setUploading(true);
+    setUploadError(null);
 
     const formData = new FormData();
     formData.append('song', file);
     formData.append('title', title.trim());
 
     const response = await fetch('/api/playlist-songs', { method: 'POST', body: formData });
+    const data = await response.json().catch(() => ({}));
+
     if (response.ok) {
       setFile(null);
       setTitle('');
-      load();
+      await load();
+    } else {
+      setUploadError(data.error ?? 'حصلت مشكلة، جرب تاني.');
     }
+    setUploading(false);
   }
 
   function togglePlay(song: Song) {
@@ -56,7 +67,8 @@ export function PlaylistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl">
         <p className="font-arDisplay text-3xl text-[#40383A]">نسمع</p>
         <p className="mb-10 text-[#8E6873]">كل أغنية ليها حكاية.</p>
@@ -68,8 +80,8 @@ export function PlaylistPage() {
         ) : (
           <ul className="space-y-2">
             {songs.map((song) => (
-              <li key={song.id}>
-                <button onClick={() => togglePlay(song)} className="flex w-full items-center justify-between rounded-xl border border-[#8E6873]/15 bg-white px-4 py-3 text-right">
+              <li key={song.id} className="list-item-enter">
+                <button onClick={() => togglePlay(song)} className="flex w-full items-center justify-between soft-card px-4 py-3 text-right">
                   <span className="text-[#8E6873]">{playingId === song.id ? '⏸' : '▶'}</span>
                   <span className="flex-1 px-3 text-[#40383A]">{song.title}{song.artist ? ` — ${song.artist}` : ''}</span>
                 </button>
@@ -78,7 +90,7 @@ export function PlaylistPage() {
           </ul>
         )}
 
-        <form onSubmit={handleUpload} className="mt-8 space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+        <form onSubmit={handleUpload} className="mt-8 space-y-3 soft-panel p-6">
           <input
             type="text"
             value={title}
@@ -87,8 +99,9 @@ export function PlaylistPage() {
             className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
           />
           <input type="file" accept="audio/*" onChange={(event) => setFile(event.target.files?.[0] ?? null)} className="w-full text-sm" />
-          <button type="submit" disabled={!file || !title.trim()} className="w-full rounded-lg bg-[#8E6873] py-2 text-sm text-white disabled:opacity-40">
-            + نضيف أغنية
+          {uploadError && <p className="text-sm text-[#8E6873]">{uploadError}</p>}
+          <button type="submit" disabled={!file || !title.trim() || uploading} className="btn-primary w-full">
+            {uploading ? '...' : '+ نضيف أغنية'}
           </button>
         </form>
       </div>

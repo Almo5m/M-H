@@ -27,19 +27,16 @@ export function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-6">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-2xl border border-rose/30 bg-warmWhite p-8 text-center shadow-lg"
-      >
-        <p className="mb-6 font-arDisplay text-2xl text-ink">عالمنا</p>
+    <div className="page-fade-in flex min-h-screen items-center justify-center bg-[#F7F1E8] px-6">
+      <form onSubmit={handleSubmit} className="w-full max-w-sm soft-panel p-8 text-center">
+        <p className="mb-6 font-arDisplay text-2xl text-[#40383A]">عالمنا</p>
 
         <input
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="الإيميل"
-          className="mb-3 w-full rounded-xl border border-rose/40 bg-cream px-4 py-3 text-center text-ink outline-none focus:border-roseDeep"
+          className="mb-3 w-full rounded-xl border border-[#8E6873]/20 bg-[#F7F1E8] px-4 py-3 text-center text-[#40383A] outline-none focus:border-[#8E6873]/50"
           required
         />
         <input
@@ -47,17 +44,13 @@ export function LoginForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="الباسورد"
-          className="mb-4 w-full rounded-xl border border-rose/40 bg-cream px-4 py-3 text-center text-ink outline-none focus:border-roseDeep"
+          className="mb-4 w-full rounded-xl border border-[#8E6873]/20 bg-[#F7F1E8] px-4 py-3 text-center text-[#40383A] outline-none focus:border-[#8E6873]/50"
           required
         />
 
-        {error && <p className="mb-3 text-sm text-roseDeep">{error}</p>}
+        {error && <p className="mb-3 text-sm text-[#8E6873]">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-roseDeep py-3 text-warmWhite transition disabled:opacity-40"
-        >
+        <button type="submit" disabled={loading} className="btn-primary w-full">
           {loading ? 'لحظة...' : 'ادخل'}
         </button>
       </form>

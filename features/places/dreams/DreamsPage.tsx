@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useState } from 'react';
 
 interface Dream {
@@ -45,7 +47,8 @@ export function DreamsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl">
         <p className="font-arDisplay text-3xl text-[#40383A]">أحلامنا</p>
         <p className="mb-10 text-[#8E6873]">حاجات نفسنا نعيشها سوا.</p>
@@ -55,12 +58,12 @@ export function DreamsPage() {
         ) : (
           <ul className="space-y-3">
             {dreams.map((dream) => (
-              <li key={dream.id} className="rounded-xl border border-[#8E6873]/15 bg-white px-4 py-3">
+              <li key={dream.id} className="soft-card list-item-enter px-4 py-3">
                 <p className="text-[#40383A]">{dream.title}</p>
                 <div className="mt-1 flex items-center justify-between text-xs text-[#8B8182]">
                   <span>{dream.status === 'اتحقق' ? 'اتحقق 🤍' : dream.status}</span>
                   {dream.status !== 'اتحقق' && (
-                    <button onClick={() => markAchieved(dream.id)} className="text-[#8E6873] underline decoration-dotted">
+                    <button onClick={() => markAchieved(dream.id)} className="btn-chip bg-[#F7F1E8] text-[#8E6873]">
                       اتحقق
                     </button>
                   )}
@@ -78,7 +81,7 @@ export function DreamsPage() {
             placeholder="إيه اللي نفسنا نعمله؟"
             className="flex-1 rounded-lg border border-[#8E6873]/30 bg-white px-3 py-2 text-sm outline-none"
           />
-          <button type="submit" className="rounded-lg bg-[#8E6873] px-4 py-2 text-sm text-white">
+          <button type="submit" className="btn-primary">
             نحفظه
           </button>
         </form>

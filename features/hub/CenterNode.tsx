@@ -11,7 +11,7 @@ export function CenterNode({ otherOnline }: { otherOnline: boolean }) {
       className="place-node group absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-2 text-center"
       style={{ top: '50%', left: '50%', animationDelay: '0ms' }}
     >
-      <span className="relative flex h-24 w-24 items-center justify-center rounded-full border border-[#8E6873]/25 bg-[#FFFBF6] shadow-md transition-transform duration-500 group-hover:-translate-y-1 sm:h-28 sm:w-28">
+      <span className="relative flex h-24 w-24 items-center justify-center rounded-full bg-[#FFFBF6] shadow-[0_4px_24px_rgba(142,104,115,0.16)] transition-transform duration-500 group-hover:-translate-y-1 sm:h-28 sm:w-28">
         <svg viewBox="0 0 60 60" className="h-10 w-10 text-[#8E6873] sm:h-12 sm:w-12">
           <path
             fill="none"

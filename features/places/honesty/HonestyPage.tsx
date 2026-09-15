@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useState } from 'react';
 
 interface Note {
@@ -73,20 +75,21 @@ export function HonestyPage() {
   const openNoteData = notes.find((note) => note.id === openId);
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl">
         <p className="font-arDisplay text-3xl text-[#40383A]">بصراحة</p>
         <p className="mb-2 text-[#8E6873]">في كلام محتاج يتقال بهدوء.</p>
         <p className="mb-8 text-sm text-[#8B8182]">هنا مفيش صح وغلط... في كلام محتاج يتسمع.</p>
 
         {!showForm && (
-          <button onClick={() => setShowForm(true)} className="mb-8 text-sm text-[#8E6873] underline decoration-dotted">
+          <button onClick={() => setShowForm(true)} className="btn-ghost mb-8">
             + أقول حاجة
           </button>
         )}
 
         {showForm && !confirming && (
-          <div className="mb-10 space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+          <div className="mb-10 space-y-3 soft-panel p-6">
             <p className="text-sm text-[#40383A]">قول اللي نفسك تقوله</p>
             <textarea
               value={content}
@@ -117,14 +120,14 @@ export function HonestyPage() {
         )}
 
         {confirming && (
-          <div className="mb-10 space-y-4 rounded-2xl border border-[#8E6873]/20 bg-white p-6 text-center">
+          <div className="mb-10 space-y-4 soft-panel p-6 text-center">
             <p className="text-sm text-[#40383A]">اقراها مرة أخيرة... هل دي فعلًا الطريقة اللي عايز توصل بيها كلامك؟</p>
             <p className="rounded-lg bg-[#F7F1E8] p-3 text-sm text-[#40383A]">{content}</p>
             <div className="flex gap-2">
-              <button onClick={send} className="flex-1 rounded-lg bg-[#8E6873] py-2 text-sm text-white">
+              <button onClick={send} className="btn-primary flex-1">
                 أبعتها
               </button>
-              <button onClick={() => setConfirming(false)} className="flex-1 rounded-lg bg-[#F7F1E8] py-2 text-sm text-[#40383A]">
+              <button onClick={() => setConfirming(false)} className="btn-ghost flex-1">
                 أرجع أعدل
               </button>
             </div>
@@ -132,7 +135,7 @@ export function HonestyPage() {
         )}
 
         {openNoteData ? (
-          <div className="rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+          <div className="soft-panel p-6">
             <button onClick={() => setOpenId(null)} className="mb-4 text-xs text-[#8B8182]">
               ← رجوع
             </button>
@@ -166,8 +169,8 @@ export function HonestyPage() {
             {notes.map((note) => {
               const isUnread = note.recipient_id === myId && !note.read_at;
               return (
-                <li key={note.id}>
-                  <button onClick={() => openNote(note)} className="w-full rounded-xl border border-[#8E6873]/15 bg-white px-4 py-3 text-right">
+                <li key={note.id} className="list-item-enter">
+                  <button onClick={() => openNote(note)} className="w-full soft-card px-4 py-3 text-right">
                     <p className="text-xs text-[#8B8182]">{note.created_by === myId ? 'أنا كتبتها' : 'من الطرف التاني'}</p>
                     <p className={`text-sm ${isUnread ? 'font-semibold text-[#40383A]' : 'text-[#8B8182]'}`}>
                       {isUnread ? 'لسه ما اتقريتش' : note.content.slice(0, 30) + '…'}

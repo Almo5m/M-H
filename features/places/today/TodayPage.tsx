@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useMemo, useState } from 'react';
 
 interface Habit {
@@ -101,14 +103,15 @@ export function TodayPage() {
   }).length;
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl">
         <div className="mb-6 flex items-baseline justify-between">
           <div>
             <p className="font-arDisplay text-3xl text-[#40383A]">يومنا</p>
             <p className="text-[#8E6873]">حاجات صغيرة بنعملها سوا.</p>
           </div>
-          <button onClick={() => setShowForm((value) => !value)} className="text-sm text-[#8E6873] underline decoration-dotted">
+          <button onClick={() => setShowForm((value) => !value)} className="btn-ghost">
             + نضيف عادة
           </button>
         </div>
@@ -138,7 +141,7 @@ export function TodayPage() {
         </div>
 
         {showForm && (
-          <form onSubmit={addHabit} className="mb-8 space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+          <form onSubmit={addHabit} className="mb-8 space-y-3 soft-panel p-6">
             <p className="text-sm text-[#40383A]">نعمل إيه؟</p>
             <input
               type="text"
@@ -221,7 +224,7 @@ export function TodayPage() {
               const isMine = isShared || habit.assigned_to === me?.id;
 
               return (
-                <li key={habit.id} className="group flex items-center justify-between rounded-xl border border-[#8E6873]/15 bg-white px-4 py-3">
+                <li key={habit.id} className="list-item-enter group flex items-center justify-between soft-card px-4 py-3">
                   <span className="text-[#40383A]">{habit.title}</span>
                   <div className="flex items-center gap-3 text-xs">
                     {isShared ? (

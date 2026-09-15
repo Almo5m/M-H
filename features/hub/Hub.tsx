@@ -104,7 +104,7 @@ export function Hub({ user }: { user: CurrentUser }) {
 function CenterNodeMobile() {
   return (
     <a href={CENTER_PLACE.href} className="flex flex-col items-center gap-2">
-      <span className="flex h-20 w-20 items-center justify-center rounded-full border border-[#8E6873]/25 bg-[#FFFBF6] shadow-md">
+      <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#FFFBF6] shadow-[0_4px_24px_rgba(142,104,115,0.16)]">
         <svg viewBox="0 0 40 40" className="h-8 w-8 text-[#8E6873]" fill="none" stroke="currentColor" strokeWidth="1.4">
           <rect x="8" y="10" width="17" height="13" rx="2" transform="rotate(-6 16.5 16.5)" />
           <rect x="15" y="16" width="17" height="13" rx="2" transform="rotate(5 23.5 22.5)" />

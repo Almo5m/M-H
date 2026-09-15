@@ -24,3 +24,116 @@ body {
   background: #e3aeb8;
   color: #241a1e;
 }
+
+/* ---------------- Shared design system ---------------- */
+
+.soft-card {
+  border-radius: 1.5rem;
+  background: #ffffff;
+  box-shadow: 0 2px 18px rgba(142, 104, 115, 0.07);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.soft-card:hover {
+  box-shadow: 0 6px 28px rgba(142, 104, 115, 0.13);
+}
+
+.soft-panel {
+  border-radius: 1.75rem;
+  background: #ffffff;
+  box-shadow: 0 4px 24px rgba(142, 104, 115, 0.08);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #8e6873;
+  color: #fffbf6;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 10px rgba(142, 104, 115, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #7a5760;
+  box-shadow: 0 4px 16px rgba(142, 104, 115, 0.32);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #f7f1e8;
+  color: #40383a;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.8125rem;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: #efe1d0;
+}
+
+.btn-ghost:active {
+  transform: scale(0.96);
+}
+
+.btn-chip {
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-chip:active {
+  transform: scale(0.94);
+}
+
+.page-fade-in {
+  animation: page-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.list-item-enter {
+  animation: list-item-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes list-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-fade-in,
+  .list-item-enter {
+    animation: none !important;
+  }
+}

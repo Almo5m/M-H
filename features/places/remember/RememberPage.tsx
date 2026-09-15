@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useMemo, useState } from 'react';
 
 interface RememberedDate {
@@ -91,20 +93,21 @@ export function RememberPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-xl">
         <div className="mb-6 flex items-baseline justify-between">
           <div>
             <p className="font-arDisplay text-3xl text-[#40383A]">نفتكر</p>
             <p className="text-[#8E6873]">عشان في أيام مينفعش تعدّي عادي.</p>
           </div>
-          <button onClick={() => setShowForm((value) => !value)} className="text-sm text-[#8E6873] underline decoration-dotted">
+          <button onClick={() => setShowForm((value) => !value)} className="btn-ghost">
             + نضيف تاريخ
           </button>
         </div>
 
         {nearest && (
-          <div className="mb-8 rounded-xl border border-[#C7A96B]/30 bg-white px-5 py-4 text-center">
+          <div className="mb-8 soft-panel px-5 py-4 text-center shadow-[0_4px_24px_rgba(199,169,107,0.18)]">
             <p className="text-xs text-[#8B8182]">أقرب حاجة نفتكرها</p>
             <p className="font-arDisplay text-xl text-[#40383A]">{relativeLabel(nearest.daysUntil)}</p>
             <p className="text-sm text-[#8E6873]">{nearest.title}</p>
@@ -112,7 +115,7 @@ export function RememberPage() {
         )}
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="mb-8 space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+          <form onSubmit={handleSubmit} className="mb-8 space-y-3 soft-panel p-6">
             <p className="text-sm text-[#40383A]">إيه التاريخ ده؟</p>
             <input
               type="text"

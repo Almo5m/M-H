@@ -1,5 +1,7 @@
 'use client';
 
+import { BackToHub } from '@/features/hub/BackToHub';
+
 import { useEffect, useState } from 'react';
 
 interface Photo {
@@ -44,14 +46,15 @@ export function MemoriesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F1E8] px-6 py-16">
+    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
+      <BackToHub />
       <div className="mx-auto max-w-4xl">
         <div className="mb-10 flex items-baseline justify-between">
           <div>
             <p className="font-arDisplay text-3xl text-[#40383A]">احنا</p>
             <p className="text-[#8E6873]">❤</p>
           </div>
-          <label className="cursor-pointer text-sm text-[#8E6873] underline decoration-dotted">
+          <label className="btn-ghost cursor-pointer">
             + نضيف ذكرى
             <input type="file" accept="image/*" className="hidden" onChange={(event) => setFile(event.target.files?.[0] ?? null)} />
           </label>
@@ -59,9 +62,9 @@ export function MemoriesPage() {
 
         {photos.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-24 text-center">
-            <svg viewBox="0 0 60 40" className="h-16 w-24 text-[#B99AA1]" fill="none" stroke="currentColor" strokeWidth="1.2">
-              <rect x="4" y="6" width="30" height="24" rx="2" transform="rotate(-5 19 18)" />
-              <rect x="20" y="10" width="30" height="24" rx="2" transform="rotate(4 35 22)" />
+            <svg viewBox="0 0 60 40" className="h-16 w-24">
+              <rect x="4" y="6" width="30" height="24" rx="3" transform="rotate(-5 19 18)" fill="#B99AA1" opacity="0.5" />
+              <rect x="20" y="10" width="30" height="24" rx="3" transform="rotate(4 35 22)" fill="#8E6873" opacity="0.6" />
             </svg>
             <p className="text-[#40383A]">لسه مفيش صور هنا.</p>
             <p className="text-sm text-[#8B8182]">أول صورة ممكن تبدأ الحكاية.</p>
@@ -71,8 +74,8 @@ export function MemoriesPage() {
             {photos.map((photo, index) => (
               <div
                 key={photo.id}
-                className="w-40 rounded-sm bg-white p-2 pb-4 shadow-md transition-transform hover:-translate-y-1"
-                style={{ transform: `rotate(${(index % 5) - 2}deg)` }}
+                className="list-item-enter w-40 rounded-sm bg-white p-2 pb-4 shadow-[0_4px_20px_rgba(142,104,115,0.12)] transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-[0_8px_28px_rgba(142,104,115,0.2)]"
+                style={{ transform: `rotate(${(index % 5) - 2}deg)`, animationDelay: `${index * 60}ms` }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={photo.url} alt={photo.caption ?? ''} className="h-40 w-full object-cover" />
@@ -86,7 +89,7 @@ export function MemoriesPage() {
         )}
 
         {file && (
-          <form onSubmit={handleUpload} className="mx-auto mt-10 max-w-sm space-y-3 rounded-2xl border border-[#8E6873]/20 bg-white p-6">
+          <form onSubmit={handleUpload} className="mx-auto mt-10 max-w-sm space-y-3 soft-panel p-6">
             <p className="text-center text-sm text-[#40383A]">نحط دي فين؟</p>
             <input
               type="text"
@@ -95,7 +98,7 @@ export function MemoriesPage() {
               placeholder="احكيلي عنها... (اختياري)"
               className="w-full rounded-lg border border-[#8E6873]/30 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
             />
-            <button type="submit" disabled={uploading} className="w-full rounded-lg bg-[#8E6873] py-2 text-sm text-white disabled:opacity-40">
+            <button type="submit" disabled={uploading} className="btn-primary w-full">
               {uploading ? '...' : 'نحطها'}
             </button>
           </form>

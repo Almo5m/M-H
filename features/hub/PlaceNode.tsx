@@ -17,7 +17,7 @@ export function PlaceNode({ place, index }: { place: Place; index: number }) {
         animationDelay: `${300 + index * 80}ms`,
       }}
     >
-      <span className="flex h-14 w-14 items-center justify-center rounded-full border border-[#8E6873]/20 bg-[#FFFBF6] text-[#8E6873] shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-[#C7A96B]/50 group-hover:shadow-[0_0_18px_rgba(199,169,107,0.35)] group-focus-visible:-translate-y-1 group-focus-visible:shadow-[0_0_18px_rgba(199,169,107,0.35)] sm:h-16 sm:w-16">
+      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FFFBF6] shadow-[0_2px_14px_rgba(142,104,115,0.1)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_6px_22px_rgba(199,169,107,0.3)] group-focus-visible:-translate-y-1 group-focus-visible:shadow-[0_6px_22px_rgba(199,169,107,0.3)] sm:h-16 sm:w-16">
         <Icon className="h-6 w-6 transition-transform duration-300 group-hover:scale-105 sm:h-7 sm:w-7" />
       </span>
       <span className="text-xs text-[#40383A] opacity-80 sm:text-sm">{label}</span>
