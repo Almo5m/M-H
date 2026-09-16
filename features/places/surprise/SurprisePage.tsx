@@ -1,6 +1,7 @@
 'use client';
 
 import { BackToHub } from '@/features/hub/BackToHub';
+import { FileUploadField } from '@/components/ui/FileUploadField';
 
 import { useEffect, useState } from 'react';
 
@@ -165,12 +166,12 @@ export function SurprisePage() {
                 value={textContent}
                 onChange={(event) => setTextContent(event.target.value)}
                 placeholder="اكتب المفاجأة..."
-                className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+                className="field-input"
                 rows={3}
                 required
               />
             ) : (
-              <input type="file" accept="image/*" onChange={(event) => setPhoto(event.target.files?.[0] ?? null)} className="text-sm" required />
+              <FileUploadField label="اختار صورة" accept="image/*" file={photo} onChange={setPhoto} />
             )}
 
             <p className="text-sm text-[#40383A]">إمتى تظهر؟</p>
@@ -178,7 +179,7 @@ export function SurprisePage() {
               type="datetime-local"
               value={revealAt}
               onChange={(event) => setRevealAt(event.target.value)}
-              className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
               required
             />
             <button type="submit" className="w-full rounded-lg bg-[#8E6873] py-2 text-sm text-white">

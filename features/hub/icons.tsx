@@ -83,3 +83,47 @@ export function SurpriseIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function TicTacToeIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="14" y="6" width="3.4" height="28" rx="1.7" fill={PRIMARY} />
+      <rect x="23" y="6" width="3.4" height="28" rx="1.7" fill={PRIMARY} />
+      <rect x="6" y="14" width="28" height="3.4" rx="1.7" fill={PRIMARY} />
+      <rect x="6" y="23" width="28" height="3.4" rx="1.7" fill={PRIMARY} />
+      <circle cx="10.2" cy="10.2" r="3.4" fill={GOLD} />
+      <path d="M28.5 26.5 L33.5 31.5 M33.5 26.5 L28.5 31.5" stroke={GOLD} strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function CategoriesIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="7" y="8" width="7" height="24" rx="2.5" fill={SECONDARY} opacity="0.85" />
+      <rect x="16.5" y="8" width="7" height="24" rx="2.5" fill={GOLD} />
+      <rect x="26" y="8" width="7" height="24" rx="2.5" fill={PRIMARY} />
+    </svg>
+  );
+}
+
+export function CardsGameIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="8" y="9" width="16" height="22" rx="3" fill={SECONDARY} opacity="0.85" transform="rotate(-10 16 20)" />
+      <rect x="16" y="9" width="16" height="22" rx="3" fill={PRIMARY} transform="rotate(8 24 20)" />
+    </svg>
+  );
+}
+
+export function LudoIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className}>
+      <rect x="6" y="6" width="12" height="12" rx="3" fill={PRIMARY} />
+      <rect x="22" y="6" width="12" height="12" rx="3" fill={GOLD} />
+      <rect x="6" y="22" width="12" height="12" rx="3" fill={GOLD} />
+      <rect x="22" y="22" width="12" height="12" rx="3" fill={PRIMARY} />
+      <circle cx="20" cy="20" r="4" fill={SECONDARY} />
+    </svg>
+  );
+}

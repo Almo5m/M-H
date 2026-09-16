@@ -8,14 +8,19 @@ import type { CurrentUser } from '@/lib/auth';
 export function SettingsPage({ user }: { user: CurrentUser }) {
   const [displayName, setDisplayName] = useState(user.displayName);
   const [relationshipStartDate, setRelationshipStartDate] = useState('');
+  const [messageToPartner, setMessageToPartner] = useState('');
   const [savingName, setSavingName] = useState(false);
   const [savingDate, setSavingDate] = useState(false);
+  const [savingMessage, setSavingMessage] = useState(false);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/api/space-settings')
       .then((response) => response.json())
-      .then((data) => setRelationshipStartDate(data.relationshipStartDate ?? ''));
+      .then((data) => {
+        setRelationshipStartDate(data.relationshipStartDate ?? '');
+        setMessageToPartner(data.myMessageToPartner ?? '');
+      });
   }, []);
 
   async function saveName(event: React.FormEvent) {
@@ -44,6 +49,20 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
     setTimeout(() => setSavedMessage(null), 2000);
   }
 
+  async function saveMessage(event: React.FormEvent) {
+    event.preventDefault();
+    if (!messageToPartner.trim()) return;
+    setSavingMessage(true);
+    await fetch('/api/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messageToPartner: messageToPartner.trim() }),
+    });
+    setSavingMessage(false);
+    setSavedMessage('اتحفظ.');
+    setTimeout(() => setSavedMessage(null), 2000);
+  }
+
   async function logout() {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.signOut();
@@ -59,26 +78,39 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
       <div className="mx-auto max-w-sm">
         <p className="mb-10 font-arDisplay text-3xl text-[#40383A]">الإعدادات</p>
 
-        <form onSubmit={saveName} className="mb-8 space-y-2">
+        <form onSubmit={saveName} className="mb-8 space-y-2 soft-panel p-5">
           <p className="text-sm text-[#8B8182]">اسمك</p>
           <input
             type="text"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
-            className="w-full rounded-lg border border-[#8E6873]/20 bg-white px-3 py-2 text-sm outline-none"
+            className="field-input"
           />
           <button type="submit" disabled={savingName} className="btn-primary">
             حفظ
           </button>
         </form>
 
-        <form onSubmit={saveDate} className="mb-8 space-y-2">
+        <form onSubmit={saveMessage} className="mb-8 space-y-2 soft-panel p-5">
+          <p className="text-sm text-[#8B8182]">الرسالة اللي هتظهرلها/هتظهرله في الصفحة الرئيسية</p>
+          <textarea
+            value={messageToPartner}
+            onChange={(event) => setMessageToPartner(event.target.value)}
+            rows={2}
+            className="field-input"
+          />
+          <button type="submit" disabled={savingMessage} className="btn-primary">
+            حفظ
+          </button>
+        </form>
+
+        <form onSubmit={saveDate} className="mb-8 space-y-2 soft-panel p-5">
           <p className="text-sm text-[#8B8182]">من إمتى إحنا مع بعض</p>
           <input
             type="date"
             value={relationshipStartDate}
             onChange={(event) => setRelationshipStartDate(event.target.value)}
-            className="w-full rounded-lg border border-[#8E6873]/20 bg-white px-3 py-2 text-sm outline-none"
+            className="field-input"
           />
           <button type="submit" disabled={savingDate} className="btn-primary">
             حفظ
@@ -87,7 +119,10 @@ export function SettingsPage({ user }: { user: CurrentUser }) {
 
         {savedMessage && <p className="mb-6 text-sm text-[#8E6873]">{savedMessage}</p>}
 
-        <button onClick={logout} className="text-sm text-[#8B8182] underline decoration-dotted">
+        <button onClick={logout} className="btn-ghost bg-transparent text-[#8B8182] shadow-none hover:bg-[#8E6873]/10">
+          <svg viewBox="0 0 20 20" className="ml-1.5 inline h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4">
+            <path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3M13 13l3-3-3-3M16 10H7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
           تسجيل خروج
         </button>
       </div>

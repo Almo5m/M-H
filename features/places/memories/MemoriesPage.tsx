@@ -96,7 +96,7 @@ export function MemoriesPage() {
               value={caption}
               onChange={(event) => setCaption(event.target.value)}
               placeholder="احكيلي عنها... (اختياري)"
-              className="w-full rounded-lg border border-[#8E6873]/30 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
             />
             <button type="submit" disabled={uploading} className="btn-primary w-full">
               {uploading ? '...' : 'نحطها'}

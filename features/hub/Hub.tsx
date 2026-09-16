@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { CurrentUser } from '@/lib/auth';
-import { getDailyLine, getDaysTogether, getGreeting } from '@/lib/dailyLines';
+import { getDaysTogether, getGreeting } from '@/lib/dailyLines';
 import { AmbientBackground } from './AmbientBackground';
 import { ScatteredHearts } from './ScatteredHearts';
 import { useClickHeartBurst } from './ClickHeartBurst';
@@ -10,16 +10,21 @@ import { HubHeader } from './HubHeader';
 import { CenterNode } from './CenterNode';
 import { PlaceNode } from './PlaceNode';
 import { OUTER_PLACES, CENTER_PLACE } from './places';
+import { UsIcon } from './icons';
 
 export function Hub({ user }: { user: CurrentUser }) {
   const [otherOnline, setOtherOnline] = useState(false);
   const [daysTogether, setDaysTogether] = useState<number | null>(null);
+  const [partnerMessage, setPartnerMessage] = useState<string | null>(null);
   const { handleClick, overlay } = useClickHeartBurst();
 
   useEffect(() => {
     fetch('/api/space-settings')
       .then((response) => response.json())
-      .then((data) => setDaysTogether(getDaysTogether(data.relationshipStartDate)));
+      .then((data) => {
+        setDaysTogether(getDaysTogether(data.relationshipStartDate));
+        setPartnerMessage(data.partnerMessageToMe ?? null);
+      });
   }, []);
 
   useEffect(() => {
@@ -46,12 +51,12 @@ export function Hub({ user }: { user: CurrentUser }) {
       {overlay}
       <HubHeader user={user} />
 
-      <div className="mx-auto max-w-md px-6 text-center sm:hidden">
+      <div className="mx-auto max-w-md px-6 pt-2 text-center">
         <p className="mb-1 font-arDisplay text-xl text-[#40383A]">
           {getGreeting()} {user.displayName}
         </p>
-        <p className="mb-1 text-sm text-[#8E6873]">{getDailyLine()}</p>
-        {daysTogether !== null && <p className="mb-4 text-xs text-[#8B8182]">من {daysTogether} يوم إحنا مع بعض</p>}
+        {partnerMessage && <p className="mb-1 text-sm text-[#8E6873]">{partnerMessage}</p>}
+        {daysTogether !== null && <p className="mb-2 text-xs text-[#8B8182]">من {daysTogether} يوم إحنا مع بعض</p>}
       </div>
 
       {/* Desktop / tablet: organic radial layout */}
@@ -105,10 +110,7 @@ function CenterNodeMobile() {
   return (
     <a href={CENTER_PLACE.href} className="flex flex-col items-center gap-2">
       <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#FFFBF6] shadow-[0_4px_24px_rgba(142,104,115,0.16)]">
-        <svg viewBox="0 0 40 40" className="h-8 w-8 text-[#8E6873]" fill="none" stroke="currentColor" strokeWidth="1.4">
-          <rect x="8" y="10" width="17" height="13" rx="2" transform="rotate(-6 16.5 16.5)" />
-          <rect x="15" y="16" width="17" height="13" rx="2" transform="rotate(5 23.5 22.5)" />
-        </svg>
+        <UsIcon className="h-8 w-8" />
       </span>
       <span className="font-arDisplay text-base text-[#40383A]">{CENTER_PLACE.label}</span>
     </a>

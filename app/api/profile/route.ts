@@ -8,10 +8,16 @@ export async function PATCH(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const displayName: string | undefined = body?.displayName;
-  if (!displayName?.trim()) return NextResponse.json({ error: 'اكتب اسم.' }, { status: 400 });
+  const messageToPartner: string | undefined = body?.messageToPartner;
 
   const supabase = getSupabaseUserClient();
-  const { error } = await supabase.from('profiles').update({ display_name: displayName.trim() }).eq('id', user.id);
+  const update: Record<string, string> = {};
+  if (displayName?.trim()) update.display_name = displayName.trim();
+  if (messageToPartner?.trim()) update.message_to_partner = messageToPartner.trim();
+
+  if (Object.keys(update).length === 0) return NextResponse.json({ error: 'مفيش حاجة اتغيرت.' }, { status: 400 });
+
+  const { error } = await supabase.from('profiles').update(update).eq('id', user.id);
 
   if (error) return NextResponse.json({ error: 'فشل الحفظ.' }, { status: 500 });
   return NextResponse.json({ ok: true });

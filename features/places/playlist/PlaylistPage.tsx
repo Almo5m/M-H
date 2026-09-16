@@ -1,6 +1,7 @@
 'use client';
 
 import { BackToHub } from '@/features/hub/BackToHub';
+import { FileUploadField } from '@/components/ui/FileUploadField';
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -40,15 +41,31 @@ export function PlaylistPage() {
     formData.append('song', file);
     formData.append('title', title.trim());
 
-    const response = await fetch('/api/playlist-songs', { method: 'POST', body: formData });
-    const data = await response.json().catch(() => ({}));
+    let response: Response;
+    try {
+      response = await fetch('/api/playlist-songs', { method: 'POST', body: formData });
+    } catch {
+      setUploadError('مفيش اتصال بالسيرفر. جرب تاني.');
+      setUploading(false);
+      return;
+    }
+
+    const rawText = await response.text();
+    let data: any = {};
+    try {
+      data = rawText ? JSON.parse(rawText) : {};
+    } catch {
+      setUploadError(`خطأ (${response.status}): ${rawText.slice(0, 200)}`);
+      setUploading(false);
+      return;
+    }
 
     if (response.ok) {
       setFile(null);
       setTitle('');
       await load();
     } else {
-      setUploadError(data.error ?? 'حصلت مشكلة، جرب تاني.');
+      setUploadError(data.error ? `${data.error}` : `خطأ (${response.status}) بلا تفاصيل.`);
     }
     setUploading(false);
   }
@@ -96,9 +113,9 @@ export function PlaylistPage() {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="اسم الأغنية"
-            className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+            className="field-input"
           />
-          <input type="file" accept="audio/*" onChange={(event) => setFile(event.target.files?.[0] ?? null)} className="w-full text-sm" />
+          <FileUploadField label="اختار ملف الأغنية" accept="audio/*" file={file} onChange={setFile} />
           {uploadError && <p className="text-sm text-[#8E6873]">{uploadError}</p>}
           <button type="submit" disabled={!file || !title.trim() || uploading} className="btn-primary w-full">
             {uploading ? '...' : '+ نضيف أغنية'}

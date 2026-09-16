@@ -122,21 +122,21 @@ export function RememberPage() {
               value={title}
               onChange={(event) => setTitle(event.target.value)}
               placeholder="اسم المناسبة"
-              className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
               required
             />
             <input
               type="date"
               value={eventDate}
               onChange={(event) => setEventDate(event.target.value)}
-              className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
               required
             />
             <textarea
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               placeholder="وصف اختياري"
-              className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
               rows={2}
             />
             <label className="flex items-center gap-2 text-sm text-[#40383A]">

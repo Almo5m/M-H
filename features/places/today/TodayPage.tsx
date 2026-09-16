@@ -147,7 +147,7 @@ export function TodayPage() {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+              className="field-input"
               required
             />
 
@@ -199,7 +199,7 @@ export function TodayPage() {
                 type="date"
                 value={onceDate}
                 onChange={(event) => setOnceDate(event.target.value)}
-                className="w-full rounded-lg border border-[#8E6873]/20 bg-[#F7F1E8] px-3 py-2 text-sm outline-none"
+                className="field-input"
                 required
               />
             )}

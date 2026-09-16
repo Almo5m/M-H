@@ -101,6 +101,61 @@ body {
   transform: scale(0.94);
 }
 
+.field-input {
+  width: 100%;
+  border-radius: 1rem;
+  background: #f7f1e8;
+  border: 1.5px solid transparent;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  color: #40383a;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-input:focus {
+  border-color: #c7a96b;
+  background: #fffbf6;
+  box-shadow: 0 0 0 4px rgba(199, 169, 107, 0.14);
+}
+
+.field-input::placeholder {
+  color: #8b8182;
+  opacity: 0.7;
+}
+
+.file-drop {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  border-radius: 1rem;
+  background: #f7f1e8;
+  border: 1.5px dashed rgba(142, 104, 115, 0.3);
+  padding: 0.85rem 1rem;
+  font-size: 0.8125rem;
+  color: #8b8182;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.file-drop:hover {
+  border-color: rgba(199, 169, 107, 0.6);
+  background: #fffbf6;
+}
+
+.file-drop-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: rgba(142, 104, 115, 0.1);
+  color: #8e6873;
+}
+
 .page-fade-in {
   animation: page-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

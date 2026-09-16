@@ -28,6 +28,7 @@ create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   display_name text not null,
   avatar_url text,
+  message_to_partner text not null default 'بحبك',
   created_at timestamptz not null default now()
 );
 
@@ -125,33 +126,6 @@ create policy "a user can upsert their own presence" on presence
   for insert with check (is_space_member(space_id) and user_id = auth.uid());
 create policy "a user can update their own presence" on presence
   for update using (user_id = auth.uid());
-
--- ---------- بصراحة / لحظة placeholder-free tables come in later phases ----------
-
--- ---------- رسالة (messages) ----------
-create table messages (
-  id uuid primary key default gen_random_uuid(),
-  space_id uuid not null references spaces(id) on delete cascade,
-  created_by uuid not null references profiles(id) default auth.uid(),
-  recipient_id uuid not null references profiles(id),
-  content text not null,
-  delivery_mode text not null check (delivery_mode in ('now', 'scheduled', 'conditional')),
-  unlock_at timestamptz,
-  condition_note text,
-  seen_unlocked_at timestamptz,
-  created_at timestamptz not null default now()
-);
-
-alter table messages enable row level security;
-
-create policy "space members can read messages" on messages
-  for select using (is_space_member(space_id));
-create policy "space members can write their own messages" on messages
-  for insert with check (is_space_member(space_id) and created_by = auth.uid());
-create policy "space members can update messages" on messages
-  for update using (is_space_member(space_id));
-create policy "space members can delete their own unsent messages" on messages
-  for delete using (is_space_member(space_id) and created_by = auth.uid());
 
 -- ---------- لحظات لينا / احنا (memory photos) ----------
 create table memory_photos (
@@ -271,51 +245,6 @@ create policy "a user can update their own habit log" on habit_logs
 create policy "a user can clear their own habit log" on habit_logs
   for delete using (user_id = auth.uid());
 
--- ---------- رحلتنا (journey timeline) ----------
-create table journey_chapters (
-  id uuid primary key default gen_random_uuid(),
-  space_id uuid not null references spaces(id) on delete cascade,
-  created_by uuid not null references profiles(id) default auth.uid(),
-  chapter_date date not null,
-  title text not null,
-  description text,
-  photo_storage_path text,
-  created_at timestamptz not null default now()
-);
-
-alter table journey_chapters enable row level security;
-
-create policy "space members can read chapters" on journey_chapters
-  for select using (is_space_member(space_id));
-create policy "space members can add chapters" on journey_chapters
-  for insert with check (is_space_member(space_id) and created_by = auth.uid());
-create policy "space members can update chapters" on journey_chapters
-  for update using (is_space_member(space_id));
-create policy "space members can delete chapters" on journey_chapters
-  for delete using (is_space_member(space_id));
-
--- ---------- لحظة (quick moments) ----------
-create table moments (
-  id uuid primary key default gen_random_uuid(),
-  space_id uuid not null references spaces(id) on delete cascade,
-  created_by uuid not null references profiles(id) default auth.uid(),
-  content text not null,
-  photo_storage_path text,
-  occurred_at timestamptz not null default now(),
-  created_at timestamptz not null default now()
-);
-
-alter table moments enable row level security;
-
-create policy "space members can read moments" on moments
-  for select using (is_space_member(space_id));
-create policy "space members can add moments" on moments
-  for insert with check (is_space_member(space_id) and created_by = auth.uid());
-create policy "space members can update moments" on moments
-  for update using (is_space_member(space_id));
-create policy "space members can delete moments" on moments
-  for delete using (is_space_member(space_id));
-
 -- ---------- نفتكر (important dates) ----------
 create table remembered_dates (
   id uuid primary key default gen_random_uuid(),
@@ -387,48 +316,64 @@ create policy "space members can update surprises" on surprises
 create policy "creators can delete their unrevealed surprises" on surprises
   for delete using (is_space_member(space_id) and created_by = auth.uid() and revealed_at is null);
 
--- ---------- نلعب (flexible game-module shell — no games wired in yet) ----------
-create table game_sessions (
+-- ---------- نلعب: shared real-time match state for all games ----------
+create table game_matches (
   id uuid primary key default gen_random_uuid(),
   space_id uuid not null references spaces(id) on delete cascade,
-  created_by uuid not null references profiles(id) default auth.uid(),
   game_key text not null,
-  result jsonb,
-  created_at timestamptz not null default now()
-);
-
-alter table game_sessions enable row level security;
-
-create policy "space members can read game sessions" on game_sessions
-  for select using (is_space_member(space_id));
-create policy "space members can log game sessions" on game_sessions
-  for insert with check (is_space_member(space_id) and created_by = auth.uid());
-
--- ---------- أماكننا (places) ----------
-create table saved_places (
-  id uuid primary key default gen_random_uuid(),
-  space_id uuid not null references spaces(id) on delete cascade,
+  state jsonb not null,
+  status text not null default 'active' check (status in ('active', 'finished')),
+  turn_user_id uuid references profiles(id),
+  winner_user_id uuid references profiles(id),
   created_by uuid not null references profiles(id) default auth.uid(),
-  title text not null,
-  latitude double precision not null,
-  longitude double precision not null,
-  description text,
-  photo_storage_path text,
-  visited boolean not null default false,
-  visited_at date,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
-alter table saved_places enable row level security;
+alter table game_matches enable row level security;
 
-create policy "space members can read places" on saved_places
+create policy "space members can read matches" on game_matches
   for select using (is_space_member(space_id));
-create policy "space members can add places" on saved_places
+create policy "space members can create matches" on game_matches
   for insert with check (is_space_member(space_id) and created_by = auth.uid());
-create policy "space members can update places" on saved_places
+create policy "space members can update matches" on game_matches
   for update using (is_space_member(space_id));
-create policy "space members can delete places" on saved_places
-  for delete using (is_space_member(space_id));
+
+alter publication supabase_realtime add table game_matches;
+
+-- Basra needs hidden information (each player's hand, and the undealt
+-- deck) that the other player must NOT be able to read — game_matches
+-- itself is readable by both space members, so it only ever holds
+-- PUBLIC game state (the table, captured piles, counts). Private state
+-- lives here instead:
+
+create table game_hands (
+  match_id uuid not null references game_matches(id) on delete cascade,
+  user_id uuid not null references profiles(id) on delete cascade,
+  cards jsonb not null default '[]'::jsonb,
+  primary key (match_id, user_id)
+);
+
+alter table game_hands enable row level security;
+
+create policy "a player can read only their own hand" on game_hands
+  for select using (user_id = auth.uid());
+
+-- No insert/update/delete policy on purpose — only the server (service
+-- role, which bypasses RLS) is ever allowed to deal or remove cards.
+
+alter publication supabase_realtime add table game_hands;
+
+create table game_decks (
+  match_id uuid primary key references game_matches(id) on delete cascade,
+  cards jsonb not null default '[]'::jsonb
+);
+
+alter table game_decks enable row level security;
+
+-- Intentionally zero policies — nobody (not even space members) can
+-- read or write this table directly; only the service-role server code
+-- that deals cards ever touches it.
 
 -- ============================================================
 -- Storage buckets — public read (access is already gated by

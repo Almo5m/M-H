@@ -79,7 +79,7 @@ export function DreamsPage() {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="إيه اللي نفسنا نعمله؟"
-            className="flex-1 rounded-lg border border-[#8E6873]/30 bg-white px-3 py-2 text-sm outline-none"
+            className="field-input flex-1"
           />
           <button type="submit" className="btn-primary">
             نحفظه
