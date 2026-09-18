@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browserClient';
 import { GameShell } from '../GameShell';
-import { LudoBoard } from './LudoBoard';
+import { LudoBoard3D } from './LudoBoard3D';
 import type { LudoColor } from '@/lib/games/ludo';
 
 interface Match {
@@ -26,6 +26,7 @@ export function LudoPage() {
   const [error, setError] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const [rolling, setRolling] = useState(false);
+  const [rollTrigger, setRollTrigger] = useState(0);
 
   async function load() {
     const response = await fetch('/api/games/ludo/match');
@@ -69,6 +70,7 @@ export function LudoPage() {
     if (!match) return;
     setError(null);
     setRolling(true);
+    setRollTrigger((value) => value + 1);
     const response = await fetch('/api/games/ludo/roll', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -144,20 +146,19 @@ export function LudoPage() {
         {error && <p className="mb-3 text-sm text-[#e08787]">{error}</p>}
 
         {myId && (
-          <LudoBoard
+          <LudoBoard3D
             colors={match.state.colors}
             tokens={match.state.tokens}
             myId={myId}
             otherId={otherId}
             movableIndices={movable}
             onTokenClick={moveToken}
+            diceValue={match.state.diceValue}
+            rollTrigger={rollTrigger}
           />
         )}
 
         <div className="mt-6 flex flex-col items-center gap-2">
-          {match.state.diceValue !== null && (
-            <p className="font-arDisplay text-2xl text-[#E3C567]">🎲 {match.state.diceValue}</p>
-          )}
           <button onClick={rollDice} disabled={!canRoll || rolling} className="game-btn">
             {rolling ? '...' : 'ارمي النرد'}
           </button>
