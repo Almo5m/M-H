@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browserClient';
-import { BackToHub } from '@/features/hub/BackToHub';
+import { GameShell } from '../GameShell';
 
 interface Match {
   id: string;
@@ -39,9 +39,10 @@ export function TicTacToePage() {
         (payload) => setMatch(payload.new as Match),
       )
       .subscribe();
-
+    const interval = setInterval(load, 2500);
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [match?.id]);
 
@@ -55,30 +56,30 @@ export function TicTacToePage() {
 
   async function playCell(index: number) {
     if (!match) return;
-    await fetch('/api/games/tic-tac-toe/move', {
+    const response = await fetch('/api/games/tic-tac-toe/move', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matchId: match.id, cellIndex: index }),
     });
+    const data = await response.json();
+    if (response.ok && data.match) setMatch(data.match);
   }
 
   if (!match || match.status === 'finished') {
     const finished = match?.status === 'finished';
     return (
-      <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-        <BackToHub />
+      <GameShell title="X O">
         <div className="mx-auto max-w-sm text-center">
-          <p className="font-arDisplay text-3xl text-[#40383A]">X O</p>
           {finished && myId && (
-            <p className="my-4 text-[#8E6873]">
-              {match!.winner_user_id ? (match!.winner_user_id === myId ? 'كسبت! 🎉' : 'كسبت هي/هو المرادي 🤍') : 'تعادل!'}
+            <p className="mb-6 text-lg text-[#E3C567]">
+              {match!.winner_user_id ? (match!.winner_user_id === myId ? 'كسبت! 🎉' : 'كسبت هي المرادي 🤍') : 'تعادل!'}
             </p>
           )}
-          <button onClick={startGame} disabled={starting} className="btn-primary mt-6">
+          <button onClick={startGame} disabled={starting} className="game-btn">
             {finished ? 'نلعب تاني' : 'ابدأ لعبة'}
           </button>
         </div>
-      </main>
+      </GameShell>
     );
   }
 
@@ -86,11 +87,9 @@ export function TicTacToePage() {
   const myTurn = match.turn_user_id === myId;
 
   return (
-    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-      <BackToHub />
+    <GameShell title="X O">
       <div className="mx-auto max-w-xs text-center">
-        <p className="font-arDisplay text-3xl text-[#40383A]">X O</p>
-        <p className="mb-6 text-sm text-[#8B8182]">
+        <p className="mb-6 text-sm text-white/60">
           إنتي {mySymbol} — {myTurn ? 'دورك' : 'مستنيين الطرف التاني'}
         </p>
 
@@ -99,7 +98,7 @@ export function TicTacToePage() {
             <button
               key={index}
               onClick={() => myTurn && !cell && playCell(index)}
-              className="soft-card flex h-20 items-center justify-center font-arDisplay text-3xl text-[#8E6873]"
+              className="flex h-20 items-center justify-center rounded-2xl bg-white/8 font-arDisplay text-3xl text-[#E3C567] backdrop-blur transition hover:bg-white/12 disabled:hover:bg-white/8"
               disabled={!myTurn || Boolean(cell)}
             >
               {cell}
@@ -107,6 +106,6 @@ export function TicTacToePage() {
           ))}
         </div>
       </div>
-    </main>
+    </GameShell>
   );
 }

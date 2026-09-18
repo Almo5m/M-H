@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browserClient';
-import { BackToHub } from '@/features/hub/BackToHub';
+import { GameShell } from '../GameShell';
 import { displayCard } from '@/lib/games/basra';
 
 interface Match {
@@ -27,6 +27,7 @@ export function BasraPage() {
   const [selectedTableCards, setSelectedTableCards] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
 
   async function load() {
     const response = await fetch('/api/games/basra/match');
@@ -59,17 +60,24 @@ export function BasraPage() {
         },
       )
       .subscribe();
+    const interval = setInterval(load, 2500);
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [match?.id, myId]);
 
   async function startGame() {
+    setStarting(true);
+    setError(null);
     const response = await fetch('/api/games/basra/start', { method: 'POST' });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
+    setStarting(false);
     if (response.ok) {
       setMatch(data.match);
       load();
+    } else {
+      setError(data.error ?? `خطأ (${response.status}) بلا تفاصيل — تأكد إن SUPABASE_SERVICE_ROLE_KEY متظبط في .env.local.`);
     }
   }
 
@@ -106,16 +114,15 @@ export function BasraPage() {
       resultLine = match.winner_user_id ? (match.winner_user_id === myId ? 'كسبتي! 🎉' : 'كسبت هي المرادي 🤍') : 'تعادل!';
     }
     return (
-      <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-        <BackToHub />
+      <GameShell title="الباصرة">
         <div className="mx-auto max-w-sm text-center">
-          <p className="font-arDisplay text-3xl text-[#40383A]">الباصرة</p>
-          {resultLine && <p className="my-4 text-[#8E6873]">{resultLine}</p>}
-          <button onClick={startGame} className="btn-primary mt-6">
-            {finished ? 'لعبة تانية' : 'ابدأ اللعبة'}
+          {resultLine && <p className="mb-6 text-lg text-[#E3C567]">{resultLine}</p>}
+          {error && <p className="mb-4 text-sm text-[#e08787]">{error}</p>}
+          <button onClick={startGame} disabled={starting} className="game-btn">
+            {starting ? '...' : finished ? 'لعبة تانية' : 'ابدأ اللعبة'}
           </button>
         </div>
-      </main>
+      </GameShell>
     );
   }
 
@@ -123,39 +130,41 @@ export function BasraPage() {
   const otherId = Object.keys(match.state.handCounts).find((id) => id !== myId);
 
   return (
-    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-      <BackToHub />
+    <GameShell title="الباصرة">
       <div className="mx-auto max-w-2xl">
-        <p className="text-center font-arDisplay text-3xl text-[#40383A]">الباصرة</p>
-        <p className="mb-4 text-center text-sm text-[#8B8182]">
+        <p className="mb-4 text-center text-sm text-white/60">
           {myTurn ? 'دورك' : 'مستنيين الطرف التاني'} · الديك: {match.state.deckCount} · ورق معاها: {otherId ? match.state.handCounts[otherId] : '—'}
         </p>
 
-        {flash && <p className="mb-4 text-center text-lg text-[#C7A96B]">{flash}</p>}
-        {error && <p className="mb-4 text-center text-sm text-[#8E6873]">{error}</p>}
+        {flash && <p className="mb-4 text-center text-lg text-[#E3C567]">{flash}</p>}
+        {error && <p className="mb-4 text-center text-sm text-[#e08787]">{error}</p>}
 
-        <p className="mb-2 text-sm text-[#8B8182]">الطاولة (دوسي تختاري ورق تاخديها)</p>
+        <p className="mb-2 text-sm text-white/50">الطاولة (دوسي تختاري ورق تاخديها)</p>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
-          {match.state.table.length === 0 && <p className="text-sm text-[#8B8182]">فاضية</p>}
+          {match.state.table.length === 0 && <p className="text-sm text-white/40">فاضية</p>}
           {match.state.table.map((card) => (
             <button
               key={card}
               onClick={() => toggleTableCard(card)}
-              className={`soft-card h-16 w-12 text-sm ${selectedTableCards.includes(card) ? 'ring-2 ring-[#C7A96B]' : ''}`}
+              className={`h-16 w-12 rounded-xl bg-white/90 text-sm text-[#241A2E] transition ${
+                selectedTableCards.includes(card) ? 'ring-2 ring-[#E3C567]' : ''
+              }`}
             >
               {displayCard(card)}
             </button>
           ))}
         </div>
 
-        <p className="mb-2 text-sm text-[#8B8182]">ورقك</p>
+        <p className="mb-2 text-sm text-white/50">ورقك</p>
         <div className="mb-6 flex flex-wrap justify-center gap-2">
           {myHand.map((card) => (
             <button
               key={card}
               onClick={() => setSelectedCard(card)}
               disabled={!myTurn}
-              className={`soft-card h-16 w-12 text-sm disabled:opacity-40 ${selectedCard === card ? 'ring-2 ring-[#8E6873]' : ''}`}
+              className={`h-16 w-12 rounded-xl bg-white/90 text-sm text-[#241A2E] transition disabled:opacity-40 ${
+                selectedCard === card ? 'ring-2 ring-[#E3C567]' : ''
+              }`}
             >
               {displayCard(card)}
             </button>
@@ -163,16 +172,16 @@ export function BasraPage() {
         </div>
 
         <div className="flex justify-center">
-          <button onClick={playCard} disabled={!myTurn || !selectedCard} className="btn-primary">
+          <button onClick={playCard} disabled={!myTurn || !selectedCard} className="game-btn">
             العب الورقة
           </button>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-4 text-center text-xs text-[#8B8182]">
+        <div className="mt-8 grid grid-cols-2 gap-4 text-center text-xs text-white/50">
           <p>ورقي المكسوبة: {myId ? (match.state.captured[myId]?.length ?? 0) : 0} · بصرات: {myId ? (match.state.basraCounts[myId] ?? 0) : 0}</p>
           <p>ورقها المكسوبة: {otherId ? (match.state.captured[otherId]?.length ?? 0) : 0} · بصرات: {otherId ? (match.state.basraCounts[otherId] ?? 0) : 0}</p>
         </div>
       </div>
-    </main>
+    </GameShell>
   );
 }

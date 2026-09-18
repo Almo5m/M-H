@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browserClient';
-import { BackToHub } from '@/features/hub/BackToHub';
+import { GameShell } from '../GameShell';
 import { CATEGORY_ORDER, ARABIC_LETTERS, type CategoryAnswers } from '@/lib/games/categories';
 
 interface Match {
   id: string;
   state: {
-    letter: string;
-    status: 'answering' | 'scoring' | 'finished';
+    letter: string | null;
+    status: 'picking' | 'answering' | 'scoring' | 'finished';
     answers: Record<string, CategoryAnswers>;
     scores: Record<string, Record<string, 0 | 5 | 10>>;
     doneBy: string | null;
@@ -20,7 +20,6 @@ interface Match {
 export function CategoriesPage() {
   const [match, setMatch] = useState<Match | null>(null);
   const [myId, setMyId] = useState<string | null>(null);
-  const [letter, setLetter] = useState(ARABIC_LETTERS[Math.floor(Math.random() * ARABIC_LETTERS.length)]);
   const [answers, setAnswers] = useState<CategoryAnswers>({});
   const [autoSubmitted, setAutoSubmitted] = useState(false);
 
@@ -46,13 +45,13 @@ export function CategoriesPage() {
         (payload) => setMatch(payload.new as Match),
       )
       .subscribe();
+    const interval = setInterval(load, 2500); // fallback in case Realtime lags
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [match?.id]);
 
-  // When the partner clicks "خلصت" first, my answering phase gets locked —
-  // auto-submit whatever I'd typed so far.
   useEffect(() => {
     if (match?.state.status === 'scoring' && !autoSubmitted && myId && match.state.doneBy !== myId) {
       setAutoSubmitted(true);
@@ -60,16 +59,14 @@ export function CategoriesPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ matchId: match.id, answers, finishing: false }),
-      });
+      })
+        .then((response) => response.json())
+        .then((data) => data.match && setMatch(data.match));
     }
   }, [match?.state.status, match?.state.doneBy, myId, autoSubmitted, answers, match?.id]);
 
   async function startRound() {
-    const response = await fetch('/api/games/categories/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ letter }),
-    });
+    const response = await fetch('/api/games/categories/start', { method: 'POST' });
     const data = await response.json();
     if (response.ok) {
       setMatch(data.match);
@@ -78,22 +75,48 @@ export function CategoriesPage() {
     }
   }
 
+  async function pickLetter(letter: string) {
+    if (!match) return;
+    const response = await fetch('/api/games/categories/pick-letter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matchId: match.id, letter }),
+    });
+    const data = await response.json();
+    if (data.match) setMatch(data.match);
+  }
+
+  async function begin() {
+    if (!match) return;
+    const response = await fetch('/api/games/categories/begin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ matchId: match.id }),
+    });
+    const data = await response.json();
+    if (data.match) setMatch(data.match);
+  }
+
   async function finish() {
     if (!match) return;
-    await fetch('/api/games/categories/submit', {
+    const response = await fetch('/api/games/categories/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matchId: match.id, answers, finishing: true }),
     });
+    const data = await response.json();
+    if (data.match) setMatch(data.match);
   }
 
   async function setScore(userId: string, category: string, points: 0 | 5 | 10) {
     if (!match) return;
-    await fetch('/api/games/categories/score', {
+    const response = await fetch('/api/games/categories/score', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ matchId: match.id, userId, category, points }),
     });
+    const data = await response.json();
+    if (data.match) setMatch(data.match);
   }
 
   const otherId = useMemo(() => {
@@ -107,81 +130,86 @@ export function CategoriesPage() {
     if (finished && match && myId) {
       resultLine = match.winner_user_id ? (match.winner_user_id === myId ? 'كسبتي! 🎉' : 'كسبت هي المرادي 🤍') : 'تعادل!';
     }
-
     return (
-      <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-        <BackToHub />
+      <GameShell title="أتوبيس كومبليت">
         <div className="mx-auto max-w-sm text-center">
-          <p className="font-arDisplay text-3xl text-[#40383A]">أتوبيس كومبليت</p>
-          {resultLine && <p className="my-4 text-[#8E6873]">{resultLine}</p>}
+          {resultLine && <p className="mb-6 text-lg text-[#E3C567]">{resultLine}</p>}
+          <button onClick={startRound} className="game-btn">
+            {finished ? 'جولة تانية' : 'ابدأ اللعبة'}
+          </button>
+        </div>
+      </GameShell>
+    );
+  }
 
-          <p className="mt-6 mb-2 text-sm text-[#8B8182]">اختاروا الحرف</p>
-          <div className="mb-6 flex flex-wrap justify-center gap-1.5">
+  if (match.state.status === 'picking') {
+    return (
+      <GameShell title="أتوبيس كومبليت">
+        <div className="mx-auto max-w-sm text-center">
+          <p className="mb-4 text-sm text-white/60">اختاروا الحرف سوا</p>
+          <div className="mb-8 flex flex-wrap justify-center gap-2">
             {ARABIC_LETTERS.map((letterOption) => (
               <button
                 key={letterOption}
-                onClick={() => setLetter(letterOption)}
-                className={`h-9 w-9 rounded-full text-sm ${letter === letterOption ? 'bg-[#8E6873] text-white' : 'bg-white text-[#40383A]'}`}
+                onClick={() => pickLetter(letterOption)}
+                className={`h-10 w-10 rounded-full text-sm transition ${
+                  match.state.letter === letterOption ? 'bg-[#E3C567] text-[#241A2E]' : 'bg-white/10 text-white'
+                }`}
               >
                 {letterOption}
               </button>
             ))}
           </div>
-
-          <button onClick={startRound} className="btn-primary">
-            {finished ? 'جولة تانية' : 'ابدأ اللعبة'}
+          <button onClick={begin} disabled={!match.state.letter} className="game-btn disabled:opacity-30">
+            ابدأ اللعبة
           </button>
         </div>
-      </main>
+      </GameShell>
     );
   }
 
   if (match.state.status === 'answering') {
     return (
-      <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-        <BackToHub />
+      <GameShell title="أتوبيس كومبليت">
         <div className="mx-auto max-w-sm">
-          <p className="text-center font-arDisplay text-3xl text-[#40383A]">أتوبيس كومبليت</p>
-          <p className="mb-6 text-center text-sm text-[#8B8182]">الحرف: {match.state.letter}</p>
-
-          <div className="space-y-3">
-            {CATEGORY_ORDER.map((category) => (
-              <div key={category.key}>
-                <label className="mb-1 block text-xs text-[#8B8182]">{category.label}</label>
-                <input
-                  type="text"
-                  value={answers[category.key] ?? ''}
-                  onChange={(event) => setAnswers((current) => ({ ...current, [category.key]: event.target.value }))}
-                  className="field-input"
-                />
-              </div>
-            ))}
+          <div className="paper-sheet">
+            <p className="mb-4 text-center text-sm text-[#8B8182]">الحرف: <span className="font-arDisplay text-xl text-[#40383A]">{match.state.letter}</span></p>
+            <div className="space-y-4">
+              {CATEGORY_ORDER.map((category) => (
+                <div key={category.key} className="paper-line">
+                  <label className="paper-line-label">{category.label}</label>
+                  <input
+                    type="text"
+                    value={answers[category.key] ?? ''}
+                    onChange={(event) => setAnswers((current) => ({ ...current, [category.key]: event.target.value }))}
+                    className="paper-line-input"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-
-          <button onClick={finish} className="btn-primary mt-6 w-full">
+          <button onClick={finish} className="game-btn mt-6 w-full">
             خلصت
           </button>
         </div>
-      </main>
+      </GameShell>
     );
   }
 
   // scoring phase
   return (
-    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-      <BackToHub />
+    <GameShell title="قارنوا الإجابات">
       <div className="mx-auto max-w-md">
-        <p className="text-center font-arDisplay text-3xl text-[#40383A]">قارنوا الإجابات</p>
-        <p className="mb-6 text-center text-sm text-[#8B8182]">حطوا نقط كل إجابة سوا (٠ / ٥ / ١٠)</p>
+        <p className="mb-6 text-center text-sm text-white/60">حطوا نقط كل إجابة سوا (٠ / ٥ / ١٠)</p>
 
         <div className="space-y-4">
           {CATEGORY_ORDER.map((category) => (
-            <div key={category.key} className="soft-card p-4">
-              <p className="mb-2 text-sm text-[#8E6873]">{category.label}</p>
+            <div key={category.key} className="rounded-2xl bg-white/8 p-4 backdrop-blur">
+              <p className="mb-2 text-sm text-[#E3C567]">{category.label}</p>
               {[myId, otherId].map((userId, index) =>
                 userId ? (
                   <div key={userId} className="mb-2 flex items-center justify-between text-sm">
-                    <span className="text-[#40383A]">
+                    <span className="text-white">
                       {index === 0 ? 'أنا' : 'الطرف التاني'}: {match.state.answers[userId]?.[category.key] || '—'}
                     </span>
                     <div className="flex gap-1">
@@ -189,10 +217,10 @@ export function CategoriesPage() {
                         <button
                           key={points}
                           onClick={() => setScore(userId, category.key, points as 0 | 5 | 10)}
-                          className={`btn-chip ${
+                          className={`h-7 w-9 rounded-full text-xs transition ${
                             match.state.scores[userId]?.[category.key] === points
-                              ? 'bg-[#8E6873] text-white'
-                              : 'bg-[#F7F1E8] text-[#40383A]'
+                              ? 'bg-[#E3C567] text-[#241A2E]'
+                              : 'bg-white/10 text-white'
                           }`}
                         >
                           {points}
@@ -206,6 +234,6 @@ export function CategoriesPage() {
           ))}
         </div>
       </div>
-    </main>
+    </GameShell>
   );
 }

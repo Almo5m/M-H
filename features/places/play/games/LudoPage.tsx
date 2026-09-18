@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/browserClient';
-import { BackToHub } from '@/features/hub/BackToHub';
+import { GameShell } from '../GameShell';
 import { LudoBoard } from './LudoBoard';
 import type { LudoColor } from '@/lib/games/ludo';
 
@@ -52,8 +52,10 @@ export function LudoPage() {
         },
       )
       .subscribe();
+    const interval = setInterval(load, 2500);
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(interval);
     };
   }, [match?.id]);
 
@@ -115,16 +117,14 @@ export function LudoPage() {
       resultLine = match.winner_user_id === myId ? 'كسبتي! 🎉' : 'كسبت هي المرادي 🤍';
     }
     return (
-      <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-        <BackToHub />
+      <GameShell title="ليدو">
         <div className="mx-auto max-w-sm text-center">
-          <p className="font-arDisplay text-3xl text-[#40383A]">ليدو</p>
-          {resultLine && <p className="my-4 text-[#8E6873]">{resultLine}</p>}
-          <button onClick={startGame} className="btn-primary mt-6">
+          {resultLine && <p className="mb-6 text-lg text-[#E3C567]">{resultLine}</p>}
+          <button onClick={startGame} className="game-btn">
             {finished ? 'لعبة تانية' : 'ابدأ اللعبة'}
           </button>
         </div>
-      </main>
+      </GameShell>
     );
   }
 
@@ -134,16 +134,14 @@ export function LudoPage() {
   const canRoll = myTurn && match.state.phase === 'roll';
 
   return (
-    <main className="page-fade-in min-h-screen bg-[#F7F1E8] px-6 py-16">
-      <BackToHub />
+    <GameShell title="ليدو">
       <div className="mx-auto max-w-md text-center">
-        <p className="font-arDisplay text-3xl text-[#40383A]">ليدو</p>
-        <p className="mb-4 text-sm text-[#8B8182]">
+        <p className="mb-4 text-sm text-white/60">
           إنتي {myColor === 'red' ? 'الأحمر' : 'الأصفر'} — {myTurn ? 'دورك' : 'مستنيين الطرف التاني'}
         </p>
 
-        {flash && <p className="mb-3 text-[#C7A96B]">{flash}</p>}
-        {error && <p className="mb-3 text-sm text-[#8E6873]">{error}</p>}
+        {flash && <p className="mb-3 text-[#E3C567]">{flash}</p>}
+        {error && <p className="mb-3 text-sm text-[#e08787]">{error}</p>}
 
         {myId && (
           <LudoBoard
@@ -158,16 +156,16 @@ export function LudoPage() {
 
         <div className="mt-6 flex flex-col items-center gap-2">
           {match.state.diceValue !== null && (
-            <p className="font-arDisplay text-2xl text-[#8E6873]">🎲 {match.state.diceValue}</p>
+            <p className="font-arDisplay text-2xl text-[#E3C567]">🎲 {match.state.diceValue}</p>
           )}
-          <button onClick={rollDice} disabled={!canRoll || rolling} className="btn-primary">
+          <button onClick={rollDice} disabled={!canRoll || rolling} className="game-btn">
             {rolling ? '...' : 'ارمي النرد'}
           </button>
           {match.state.phase === 'move' && myTurn && movable.length > 0 && (
-            <p className="text-xs text-[#8B8182]">دوسي على عسكري مضيء عشان تحركيه</p>
+            <p className="text-xs text-white/50">دوسي على عسكري مضيء عشان تحركيه</p>
           )}
         </div>
       </div>
-    </main>
+    </GameShell>
   );
 }

@@ -59,5 +59,6 @@ export async function POST(request: NextRequest) {
   const { error } = await supabase.from('game_matches').update(update).eq('id', matchId);
   if (error) return NextResponse.json({ error: 'فشل تسجيل الحركة.' }, { status: 500 });
 
-  return NextResponse.json({ ok: true });
+  const { data: updated } = await supabase.from('game_matches').select('*').eq('id', matchId).maybeSingle();
+  return NextResponse.json({ ok: true, match: updated });
 }

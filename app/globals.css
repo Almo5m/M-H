@@ -156,6 +156,98 @@ body {
   color: #8e6873;
 }
 
+/* ---------------- Game zone (distinct world for نلعب) ---------------- */
+
+.game-world {
+  position: relative;
+  background: radial-gradient(circle at 20% 10%, #3a2a4a 0%, #241a2e 55%, #1a1425 100%);
+  color: #fffbf6;
+  overflow: hidden;
+}
+
+.game-world::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(1px 1px at 10% 20%, rgba(227, 197, 103, 0.5), transparent),
+    radial-gradient(1px 1px at 80% 15%, rgba(227, 197, 103, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 60% 70%, rgba(227, 197, 103, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 85%, rgba(227, 197, 103, 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 90% 60%, rgba(227, 197, 103, 0.35), transparent);
+  pointer-events: none;
+}
+
+.game-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e3c567, #c7a96b);
+  color: #241a2e;
+  padding: 0.65rem 1.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(227, 197, 103, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+}
+
+.game-btn:hover:not(:disabled) {
+  box-shadow: 0 6px 26px rgba(227, 197, 103, 0.5);
+}
+
+.game-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.game-btn:disabled {
+  opacity: 0.35;
+}
+
+/* ---------------- Paper-sheet look (أتوبيس كومبليت) ---------------- */
+
+.paper-sheet {
+  background: #fdf8ee;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2.55rem,
+    rgba(142, 104, 115, 0.15) 2.56rem
+  );
+  border-radius: 0.5rem;
+  padding: 1.5rem 1.5rem 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  color: #40383a;
+}
+
+.paper-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.paper-line-label {
+  flex-shrink: 0;
+  width: 4rem;
+  font-size: 0.8125rem;
+  color: #8e6873;
+}
+
+.paper-line-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px dashed rgba(142, 104, 115, 0.35);
+  padding: 0.15rem 0.25rem;
+  font-family: var(--font-ar-display);
+  font-size: 1.1rem;
+  color: #40383a;
+  outline: none;
+}
+
+.paper-line-input:focus {
+  border-bottom-color: #c7a96b;
+}
+
 .page-fade-in {
   animation: page-fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

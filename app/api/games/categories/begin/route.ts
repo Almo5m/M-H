@@ -8,25 +8,17 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const matchId: string | undefined = body?.matchId;
-  const answers = body?.answers;
-  const finishing: boolean = Boolean(body?.finishing);
-
-  if (!matchId || !answers) return NextResponse.json({ error: 'ناقص بيانات.' }, { status: 400 });
+  if (!matchId) return NextResponse.json({ error: 'ناقص بيانات.' }, { status: 400 });
 
   const supabase = getSupabaseUserClient();
   const { data: match } = await supabase.from('game_matches').select('*').eq('id', matchId).maybeSingle();
-  if (!match) return NextResponse.json({ error: 'مفيش لعبة زي كده.' }, { status: 404 });
-
-  const newState = { ...match.state, answers: { ...match.state.answers, [user.id]: answers } };
-
-  if (finishing && match.state.status === 'answering') {
-    newState.status = 'scoring';
-    newState.doneBy = user.id;
+  if (!match || match.state.status !== 'picking' || !match.state.letter) {
+    return NextResponse.json({ error: 'اختاروا حرف الأول.' }, { status: 400 });
   }
 
   const { error } = await supabase
     .from('game_matches')
-    .update({ state: newState, updated_at: new Date().toISOString() })
+    .update({ state: { ...match.state, status: 'answering' }, updated_at: new Date().toISOString() })
     .eq('id', matchId);
 
   if (error) return NextResponse.json({ error: 'فشل الحفظ.' }, { status: 500 });
