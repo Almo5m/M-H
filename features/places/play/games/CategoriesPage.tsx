@@ -22,6 +22,7 @@ export function CategoriesPage() {
   const [myId, setMyId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<CategoryAnswers>({});
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   async function load() {
     const response = await fetch('/api/games/categories/match');
@@ -66,12 +67,15 @@ export function CategoriesPage() {
   }, [match?.state.status, match?.state.doneBy, myId, autoSubmitted, answers, match?.id]);
 
   async function startRound() {
+    setStartError(null);
     const response = await fetch('/api/games/categories/start', { method: 'POST' });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     if (response.ok) {
       setMatch(data.match);
       setAnswers({});
       setAutoSubmitted(false);
+    } else {
+      setStartError(data.error ?? `خطأ (${response.status}) بلا تفاصيل.`);
     }
   }
 
@@ -134,6 +138,7 @@ export function CategoriesPage() {
       <GameShell title="أتوبيس كومبليت">
         <div className="mx-auto max-w-sm text-center">
           {resultLine && <p className="mb-6 text-lg text-[#E3C567]">{resultLine}</p>}
+          {startError && <p className="mb-4 text-sm text-[#e08787]">{startError}</p>}
           <button onClick={startRound} className="game-btn">
             {finished ? 'جولة تانية' : 'ابدأ اللعبة'}
           </button>

@@ -98,7 +98,7 @@ export function TicTacToePage() {
             <button
               key={index}
               onClick={() => myTurn && !cell && playCell(index)}
-              className="flex h-20 items-center justify-center rounded-2xl bg-white/8 font-arDisplay text-3xl text-[#E3C567] backdrop-blur transition hover:bg-white/12 disabled:hover:bg-white/8"
+              className="flex h-20 items-center justify-center rounded-2xl border border-white/20 bg-white/15 font-arDisplay text-3xl text-[#E3C567] shadow-inner backdrop-blur transition hover:bg-white/20 disabled:hover:bg-white/15"
               disabled={!myTurn || Boolean(cell)}
             >
               {cell}
